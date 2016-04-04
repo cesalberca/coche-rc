@@ -39,8 +39,39 @@ void loop() {
    */
   void avanzarCoche() {
     digitalWrite(motorDelanteIzq, HIGH);
-    delay(1000);
+    digitalWrite(motorDelanteDcha, HIGH);
+    digitalWrite(motorTrasIzq, HIGH);
+    digitalWrite(motorTrasDcha, HIGH);
+  }
+
+   /**
+   * Función para hacer que el coche se pare.
+   */
+  void pararCoche() {
     digitalWrite(motorDelanteIzq, LOW);
+    digitalWrite(motorDelanteDcha, LOW);
+    digitalWrite(motorTrasIzq, LOW);
+    digitalWrite(motorTrasDcha, LOW);
+  }
+
+   /**
+   * Función para hacer que el coche gire hacia la izquierda.
+   */
+  void girarCocheIzq() {
+    digitalWrite(motorDelanteIzq, HIGH);
+    digitalWrite(motorDelanteDcha, LOW);
+    digitalWrite(motorTrasIzq, HIGH);
+    digitalWrite(motorTrasDcha, LOW);
+  }
+
+   /**
+   * Función para hacer que el coche gire hacia la izquierda.
+   */
+  void girarCocheDcha() {
+    digitalWrite(motorDelanteIzq, LOW);
+    digitalWrite(motorDelanteDcha, HIGH);
+    digitalWrite(motorTrasIzq, LOW);
+    digitalWrite(motorTrasDcha, HIGH);
   }
   
   /**
