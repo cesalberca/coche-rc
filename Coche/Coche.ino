@@ -4,16 +4,22 @@ int motoresDerechosAvanzar = 6;
 int motoresDerechosRetroceder = 7;
 
 int ledEncendido = 8;
-int trig = 10;
-int echo = 11;
+int ledIzq = 9;
+int ledDcha = 10;
+int claxon = 11;
+int trig = 12;
+int echo = 13;
 float distancia;
 
 
 void setup() {
   Serial.begin(9600);
-  pinMode(trig, OUTPUT);
+  pinMode(trig, HIGH);
   pinMode(echo, INPUT);
   pinMode(ledEncendido, OUTPUT);
+  pinMode(ledIzq, OUTPUT);
+  pinMode(ledDcha, OUTPUT);
+  pinMode(claxon, OUTPUT);
   pinMode(motoresIzquierdosAvanzar, OUTPUT);
   pinMode(motoresIzquierdosRetroceder, OUTPUT);
   pinMode(motoresDerechosAvanzar, OUTPUT);
@@ -21,9 +27,13 @@ void setup() {
 }
 
 void loop() {
-  encenderCoche();
-  girarCocheDcha();  
-  //avanzarCoche();
+  
+  //encenderCoche();
+  //apagarLeds();
+  //girarCocheIzq();  
+  //pararCoche();
+  //  pitar();
+  avanzarCoche();
   //digitalWrite(motoresIzquierdosRetroceder, HIGH);
   //digitalWrite(motoresIzquierdosAvanzar, HIGH);
   //digitalWrite(motoresDerechosRetro, HIGH);
@@ -37,8 +47,9 @@ void loop() {
    * Función para hacer que el coche se mueva hacia delante.
    */
   void avanzarCoche() {
+    apagarLeds();
     digitalWrite(motoresIzquierdosAvanzar, HIGH);
-    digitalWrite(motoresDerechosAvanzar, HIGH);
+    digitalWrite(motoresDerechosAvanzar, HIGH);  
   }
 
   /**
@@ -53,6 +64,7 @@ void loop() {
    * Función para hacer que el coche se pare.
    */
   void pararCoche() {
+    encenderLedsParada();
     digitalWrite(motoresIzquierdosAvanzar, LOW);
     digitalWrite(motoresDerechosAvanzar, LOW);
     digitalWrite(motoresIzquierdosRetroceder, LOW);
@@ -63,6 +75,7 @@ void loop() {
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheDcha() {
+    encenderLedDcha();
     if (giroCerrado()) {
       digitalWrite(motoresIzquierdosAvanzar, HIGH);
       digitalWrite(motoresDerechosRetroceder, HIGH);
@@ -75,6 +88,7 @@ void loop() {
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheIzq() {
+    encenderLedIzq();
     if (giroCerrado()) {
       digitalWrite(motoresDerechosAvanzar, HIGH);
       digitalWrite(motoresIzquierdosRetroceder, HIGH);  
@@ -101,7 +115,7 @@ void loop() {
   /**
    * Función para determinar la distancia que hay entre el coche y un obstáculo.
    */
-  float  medirDistancia() {
+  float medirDistancia() {
     //Inicializamos el sensor
     digitalWrite(trig, LOW);
     delayMicroseconds(5);
@@ -113,6 +127,8 @@ void loop() {
 
     distancia = pulseIn(echo, HIGH);
     distancia = distancia * 0.0001657;
+    Serial.println(distancia);
+    
     return distancia;
   }
 
@@ -149,12 +165,28 @@ void loop() {
   }
 
   /**
+   * Función para apagar leds.
+   */
+  void apagarLeds() {
+    digitalWrite(ledIzq, LOW);
+    digitalWrite(ledDcha, LOW);
+  }
+
+  /**
    * Función para encender los leds de parada.
    */
-   void encenderLedsParar() {
+   void encenderLedsParada() {
     encenderLedIzq();
     encenderLedDcha();
    }
+
+  /* ==========================*/
+  /* = Funciones de sensores  =*/
+  /* ==========================*/
+
+  void pitar() {
+    analogWrite(claxon,100);
+  }
 
 
 
