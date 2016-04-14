@@ -21,15 +21,15 @@ void setup() {
 }
 
 void loop() {
-  //encenderCoche();
-  //girarCocheDcha();  
-  girarCocheIzq();
+  encenderCoche();
+  girarCocheDcha();  
+  //avanzarCoche();
   //digitalWrite(motoresIzquierdosRetroceder, HIGH);
   //digitalWrite(motoresIzquierdosAvanzar, HIGH);
   //digitalWrite(motoresDerechosRetro, HIGH);
  }
 
-/**
+  /**
    * Función para encender el coche. Enciende el Led de Encendido.
    */
   void encenderCoche() {
@@ -59,7 +59,7 @@ void loop() {
     digitalWrite(motoresDerechosRetroceder, HIGH);
   }
 
-   /**
+  /**
    * Función para hacer que el coche se pare.
    */
   void pararCoche() {
@@ -69,26 +69,45 @@ void loop() {
     digitalWrite(motoresDerechosRetroceder, LOW);
   }
 
-   /**
+  /**
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheDcha() {
-    digitalWrite(motoresIzquierdosAvanzar, HIGH);
-    digitalWrite(motoresDerechosRetroceder, HIGH);
+    if (giroCerrado()) {
+      digitalWrite(motoresIzquierdosAvanzar, HIGH);
+      digitalWrite(motoresDerechosRetroceder, HIGH);
+    } else {
+      digitalWrite(motoresIzquierdosAvanzar, HIGH);  
+    }
   }
 
-   /**
+  /**
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheIzq() {
-    digitalWrite(motoresDerechosAvanzar, HIGH);
-    digitalWrite(motoresIzquierdosRetroceder, HIGH);
+    if (giroCerrado()) {
+      digitalWrite(motoresDerechosAvanzar, HIGH);
+      digitalWrite(motoresIzquierdosRetroceder, HIGH);  
+    } else {
+      digitalWrite(motoresDerechosAvanzar, HIGH);
+    }
+  }
+  
+  /**
+   * Función para comprobar si se debe ejecutar un giroAbierto o un giroCerrado 
+   */
+  boolean giroCerrado() {
+    if(medirDistancia() < 0.20) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   /**
    * Función para determinar la distancia que hay entre el coche y un obstáculo.
    */
-  void medirDistancia() {
+  float  medirDistancia() {
     //Inicializamos el sensor
     digitalWrite(trig, LOW);
     delayMicroseconds(5);
@@ -100,10 +119,5 @@ void loop() {
 
     distancia = pulseIn(echo, HIGH);
     distancia = distancia * 0.0001657;
-
-    if (distancia < 0.10)
-    {
-      // parar();
-      Serial.println("Parar");
-    }
+    return distancia;
   }
