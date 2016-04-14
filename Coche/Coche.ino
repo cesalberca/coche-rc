@@ -28,20 +28,10 @@ void loop() {
   //digitalWrite(motoresIzquierdosAvanzar, HIGH);
   //digitalWrite(motoresDerechosRetro, HIGH);
  }
-
-  /**
-   * Función para encender el coche. Enciende el Led de Encendido.
-   */
-  void encenderCoche() {
-    digitalWrite(ledEncendido, HIGH);
-  }
-
-  /**
-   * Función para apagar el coche. Apaga el Led de Encendido.
-   */
-  void apagarCoche() {
-    digitalWrite(ledEncendido, LOW);
-  }
+ 
+  /* ============================*/
+  /* = Funciones de movimiento  =*/
+  /* ============================*/
 
   /**
    * Función para hacer que el coche se mueva hacia delante.
@@ -92,6 +82,10 @@ void loop() {
       digitalWrite(motoresDerechosAvanzar, HIGH);
     }
   }
+
+  /* =========================*/
+  /* = Funciones de medición =*/
+  /* =========================*/
   
   /**
    * Función para comprobar si se debe ejecutar un giroAbierto o un giroCerrado 
@@ -121,3 +115,53 @@ void loop() {
     distancia = distancia * 0.0001657;
     return distancia;
   }
+
+  /* ======================*/
+  /* = Funciones de leds  =*/
+  /* ======================*/
+
+  /**
+   * Función para encender el coche. Enciende el Led de Encendido.
+   */
+  void encenderCoche() {
+    digitalWrite(ledEncendido, HIGH);
+  }
+
+  /**
+   * Función para apagar el coche. Apaga el Led de Encendido.
+   */
+  void apagarCoche() {
+    digitalWrite(ledEncendido, LOW);
+  }
+  
+  /**
+   * Función para encender led intermitente izquierdo.
+   */
+  void encenderLedIzq() {
+    digitalWrite(ledIzq, HIGH);
+  }
+  
+  /**
+   * Función para encender led intermitente derecho.
+   */
+  void encenderLedDcha() {
+    digitalWrite(ledDcha, HIGH);
+  }
+
+  /**
+   * Función para encender los leds de parada.
+   */
+   void encenderLedsParar() {
+    encenderLedIzq();
+    encenderLedDcha();
+   }
+
+
+
+
+
+
+
+
+
+   
