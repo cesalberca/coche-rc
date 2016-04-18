@@ -16,7 +16,7 @@ int trig = 12;
 int echo = 13;
 float distancia;
 
-boolean modoAutomatico = true;
+boolean modoAutomatico = false;
 float distanciaMinima = 0.20;
 char orden;
 
@@ -39,42 +39,82 @@ void setup() {
 }
 
 void loop() {
-  
-
   // Bluetooth disponible, pasamos a leer.
   if (BT.available()){
-    //Serial.write(BT.read());
-    orden = Serial.read();
     
-    switch(orden) {
-      case 'a':
-        avanzarCoche();
-        break;
-      case 'b':
-        retrocederCoche();
-        break;
-      default:
-        pararCoche();
+    //Serial.write(BT.read());
+    orden = BT.read();
+
+    // Avanzar
+    if (orden == '1') {
+      pararCoche();
+      avanzarCoche();      
     }
-  } else {
-    moverAI();
+
+    // Retroceder
+    if (orden == '2') {
+      pararCoche();
+      retrocederCoche();
+    }
+
+    // Girar izq
+    if (orden == '3') {
+      pararCoche();
+      girarCocheIzq();
+    }
+
+    // Girar dcha
+    if (orden == '4') {
+      pararCoche();
+      girarCocheDcha();
+    }
+
+    // Nitro
+    if (orden == '5') {
+      pararCoche();
+      retrocederCoche();
+    }
+
+    // Pitar
+    if (orden == '6') {
+      pararCoche();
+      retrocederCoche();
+    }
+    
+    // Faros
+    if (orden == '7') {
+      pararCoche();
+      retrocederCoche();
+    }
+
+    // Radio
+    if (orden == '8') {
+      pararCoche();
+      retrocederCoche();
+    }
+
+    // Automático
+    if (orden == '9') {
+      pararCoche();
+      modoAutomatico = true;
+      moverAI();
+    } else {
+      // Potencial bug
+      modoAutomatico = false;
+    }
+
+    // Linea
+    if (orden == 'a') {
+      pararCoche();
+      retrocederCoche();
+    }
   }
 
-  
-
   // Envia datos al coche via bluetooth.
-  /*if (Serial.available()){
+  if (Serial.available()){
     BT.write(Serial.read());
-  }*/
-  
-  //girarCocheIzq();  
-  //pararCoche();
-  //  pitar();
-  //avanzarCoche();
-  //digitalWrite(motoresIzquierdosRetroceder, HIGH);
-  //digitalWrite(motoresIzquierdosAvanzar, HIGH);
-  //digitalWrite(motoresDerechosRetro, HIGH);
- }
+  } 
+}
  
   /* ============================*/
   /* = Funciones de movimiento  =*/
