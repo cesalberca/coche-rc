@@ -11,6 +11,7 @@ int trig = 12;
 int echo = 13;
 float distancia;
 
+boolean modoAutomatico = false;
 
 void setup() {
   Serial.begin(9600);
@@ -27,13 +28,12 @@ void setup() {
 }
 
 void loop() {
-  
   //encenderCoche();
   //apagarLeds();
-  //girarCocheIzq();  
+  girarCocheIzq();  
   //pararCoche();
   //  pitar();
-  avanzarCoche();
+  //avanzarCoche();
   //digitalWrite(motoresIzquierdosRetroceder, HIGH);
   //digitalWrite(motoresIzquierdosAvanzar, HIGH);
   //digitalWrite(motoresDerechosRetro, HIGH);
@@ -47,9 +47,13 @@ void loop() {
    * Función para hacer que el coche se mueva hacia delante.
    */
   void avanzarCoche() {
-    apagarLeds();
-    digitalWrite(motoresIzquierdosAvanzar, HIGH);
-    digitalWrite(motoresDerechosAvanzar, HIGH);  
+    if(medirDistancia() > 0.20) {
+      apagarLeds();
+      digitalWrite(motoresIzquierdosAvanzar, HIGH);
+      digitalWrite(motoresDerechosAvanzar, HIGH);    
+    } else {
+      pararCoche();
+    }
   }
 
   /**
@@ -80,7 +84,8 @@ void loop() {
       digitalWrite(motoresIzquierdosAvanzar, HIGH);
       digitalWrite(motoresDerechosRetroceder, HIGH);
     } else {
-      digitalWrite(motoresIzquierdosAvanzar, HIGH);  
+      digitalWrite(motoresIzquierdosAvanzar, HIGH); 
+      digitalWrite(motoresDerechosRetroceder, LOW); 
     }
   }
 
@@ -94,6 +99,7 @@ void loop() {
       digitalWrite(motoresIzquierdosRetroceder, HIGH);  
     } else {
       digitalWrite(motoresDerechosAvanzar, HIGH);
+      digitalWrite(motoresIzquierdosRetroceder, LOW);  
     }
   }
 
