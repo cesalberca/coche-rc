@@ -95,12 +95,14 @@ void loop() {
 
     // Automático
     if (orden == '9') {
-      pararCoche();
-      modoAutomatico = true;
-      moverAI();
-    } else {
-      // Potencial bug
-      modoAutomatico = false;
+      if(!modoAutomatico) {
+        pararCoche();  
+        moverAI();
+        modoAutomatico = true;
+      } else {
+        pararCoche();
+        modoAutomatico = false;
+      } 
     }
 
     // Linea
