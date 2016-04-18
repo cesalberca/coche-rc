@@ -1,3 +1,8 @@
+#include <SoftwareSerial.h>
+
+int txd = 2;
+int rxd = 3;
+
 int motoresIzquierdosAvanzar = 4;
 int motoresIzquierdosRetroceder = 5;
 int motoresDerechosAvanzar = 6;
@@ -11,10 +16,15 @@ int trig = 12;
 int echo = 13;
 float distancia;
 
-boolean modoAutomatico = false;
+boolean modoAutomatico = true;
+float distanciaMinima = 0.20;
+char orden;
+
+SoftwareSerial BT(txd, rxd);
 
 void setup() {
   Serial.begin(9600);
+  BT.begin(9600);
   pinMode(trig, HIGH);
   pinMode(echo, INPUT);
   pinMode(ledEncendido, OUTPUT);
@@ -25,12 +35,39 @@ void setup() {
   pinMode(motoresIzquierdosRetroceder, OUTPUT);
   pinMode(motoresDerechosAvanzar, OUTPUT);
   pinMode(motoresDerechosRetroceder, OUTPUT);
+  randomSeed(analogRead(0)); 
 }
 
 void loop() {
-  //encenderCoche();
-  //apagarLeds();
-  girarCocheIzq();  
+  
+
+  // Bluetooth disponible, pasamos a leer.
+  if (BT.available()){
+    //Serial.write(BT.read());
+    orden = Serial.read();
+    
+    switch(orden) {
+      case 'a':
+        avanzarCoche();
+        break;
+      case 'b':
+        retrocederCoche();
+        break;
+      default:
+        pararCoche();
+    }
+  } else {
+    moverAI();
+  }
+
+  
+
+  // Envia datos al coche via bluetooth.
+  /*if (Serial.available()){
+    BT.write(Serial.read());
+  }*/
+  
+  //girarCocheIzq();  
   //pararCoche();
   //  pitar();
   //avanzarCoche();
@@ -47,7 +84,7 @@ void loop() {
    * Función para hacer que el coche se mueva hacia delante.
    */
   void avanzarCoche() {
-    if(medirDistancia() > 0.20) {
+    if(medirDistancia() > distanciaMinima) {
       apagarLeds();
       digitalWrite(motoresIzquierdosAvanzar, HIGH);
       digitalWrite(motoresDerechosAvanzar, HIGH);    
@@ -102,6 +139,38 @@ void loop() {
       digitalWrite(motoresIzquierdosRetroceder, LOW);  
     }
   }
+
+  /* =============================*/
+  /* = Funciones modo automático =*/
+  /* =============================*/
+
+  /**
+   * Función modo automático. Detectará obstáculos e intentará evitarlos.
+   */
+  void moverAI() {
+    int randNum;
+    int delayGiro = 750;
+    
+    if(medirDistancia() > distanciaMinima) {
+      avanzarCoche();
+    } else {
+      randNum = random(1, 3);
+
+      if (randNum == 1) {
+        pararCoche();
+        girarCocheIzq();
+        delay(delayGiro);
+        pararCoche();
+      } else {
+        pararCoche();
+        girarCocheDcha();
+        delay(delayGiro);
+        pararCoche();
+      }
+   }
+}
+
+  
 
   /* =========================*/
   /* = Funciones de medición =*/
