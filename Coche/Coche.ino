@@ -110,6 +110,13 @@ void loop() {
       pararCoche();
       retrocederCoche();
     }
+
+    // Parar
+    if (orden == 'b') {
+      pararCoche();
+    }
+  } else {
+    moverAI();
   }
 
   // Envia datos al coche via bluetooth.
