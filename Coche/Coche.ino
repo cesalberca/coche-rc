@@ -212,8 +212,6 @@ void loop() {
    }
 }
 
-  
-
   /* =========================*/
   /* = Funciones de medición =*/
   /* =========================*/
@@ -302,15 +300,5 @@ void loop() {
   /* ==========================*/
 
   void pitar() {
-    analogWrite(claxon,100);
-  }
-
-
-
-
-
-
-
-
-
-   
+    analogWrite(claxon, 100);
+  }  
