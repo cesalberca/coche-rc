@@ -1,17 +1,22 @@
 #include <SoftwareSerial.h>
 
+// Pines bluetooth
 int txd = 2;
 int rxd = 3;
 
+// Pines motores
 int motoresIzquierdosAvanzar = 4;
 int motoresIzquierdosRetroceder = 5;
 int motoresDerechosAvanzar = 6;
 int motoresDerechosRetroceder = 7;
 
+// Pines leds
 int ledEncendido = 8;
 int ledIzq = 9;
 int ledDcha = 10;
 int claxon = 11;
+
+// Sensor distancia
 int trig = 12;
 int echo = 13;
 float distancia;
@@ -40,11 +45,12 @@ void setup() {
 
 void loop() {
   // Bluetooth disponible, pasamos a leer.
+  //
   if (BT.available()){
     
-    //Serial.write(BT.read());
+    Serial.write(BT.read());
     orden = BT.read();
-
+    
     // Avanzar
     if (orden == '1') {
       pararCoche();
@@ -115,14 +121,17 @@ void loop() {
     if (orden == 'b') {
       pararCoche();
     }
+
+     // Envia datos al coche via bluetooth.
+    if (Serial.available()){
+      BT.write(Serial.read());
+    } 
   } else {
-    moverAI();
+    //avanzarCoche();      
+    //moverAI();
   }
 
-  // Envia datos al coche via bluetooth.
-  if (Serial.available()){
-    BT.write(Serial.read());
-  } 
+ 
 }
  
   /* ============================*/
