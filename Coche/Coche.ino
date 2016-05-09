@@ -5,15 +5,15 @@ int txd = 2;
 int rxd = 3;
 
 // Pines motores
-int motoresIzquierdosAvanzar = 4;
-int motoresIzquierdosRetroceder = 5;
-int motoresDerechosAvanzar = 6;
-int motoresDerechosRetroceder = 7;
+int motoresIzquierdosAvanzar = 5;
+int motoresIzquierdosRetroceder = 4;
+int motoresDerechosAvanzar = 7;
+int motoresDerechosRetroceder = 6;
 
 // Pines leds
 int ledEncendido = 8;
-int ledIzq = 9;
-int ledDcha = 10;
+int ledDcha = 9;
+int ledIzq = 10;
 int claxon = 11;
 
 // Sensor distancia
@@ -30,7 +30,6 @@ SoftwareSerial BT(txd, rxd);
 
 void setup() {
   Serial.begin(9600);
-  BT.begin(9600);
   pinMode(trig, HIGH);
   pinMode(echo, INPUT);
   pinMode(ledEncendido, OUTPUT);
@@ -42,93 +41,51 @@ void setup() {
   pinMode(motoresDerechosAvanzar, OUTPUT);
   pinMode(motoresDerechosRetroceder, OUTPUT);
   randomSeed(analogRead(0)); 
+  BT.begin(9600); 
 }
 
-void loop() {
-  // Bluetooth disponible, pasamos a leer.
-  if (BT.available()){
-    
-    Serial.write(BT.read());
+void loop() { 
+  // Si el modulo a manda dato, guardarlo en estado.
+  if (BT.available()) {
     orden = BT.read();
-    
-    // Avanzar
-    if (orden == '1') {
-      pararCoche();
-      avanzarCoche();      
-    }
+    Serial.write(BT.read());
+  }
+  
+  if (Serial.available()) {
+    BT.write(Serial.read());
+  }
 
+  // Avanzar
+  if (orden == '1') {
+    avanzarCoche();      
+  } else if (orden == '2') {
     // Retroceder
-    if (orden == '2') {
-      pararCoche();
-      retrocederCoche();
-    }
-
-    // Girar izq
-    if (orden == '3') {
-      pararCoche();
-      girarCocheIzq();
-    }
-
-    // Girar dcha
-    if (orden == '4') {
-      pararCoche();
-      girarCocheDcha();
-    }
-
-    // Nitro
-    if (orden == '5') {
-      pararCoche();
-      retrocederCoche();
-    }
-
-    // Pitar
-    if (orden == '6') {
-      pararCoche();
-      retrocederCoche();
-    }
-    
-    // Faros
-    if (orden == '7') {
-      pararCoche();
-      retrocederCoche();
-    }
-
-    // Radio
-    if (orden == '8') {
-      pararCoche();
-      retrocederCoche();
-    }
-
-    // Automático
-    if (orden == '9') {
-      if(!modoAutomatico) {
-        pararCoche();  
-        moverAI();
-        modoAutomatico = true;
-      } else {
-        pararCoche();
-        modoAutomatico = false;
-      } 
-    }
-
-    // Linea
-    if (orden == 'a') {
-      pararCoche();
-      retrocederCoche();
-    }
-
-    // Parar
-    if (orden == 'b') {
-      pararCoche();
-    }
-
-    // Envia datos al coche via bluetooth.
-    if (Serial.available()){
-      BT.write(Serial.read());
+    retrocederCoche();
+  } else if (orden == '3') {
+    girarCocheIzq();
+  } else if (orden == '4') {
+    girarCocheDcha();
+  } else if (orden == '5') {
+    retrocederCoche();
+  } else if (orden == '6') {
+    retrocederCoche();
+  } else if (orden == '7') {
+    retrocederCoche();
+  } else if (orden == '8') {
+    retrocederCoche();
+  } else if (orden == '9') {
+    if(!modoAutomatico) {
+      moverAI();
+      modoAutomatico = true;
+    } else {
+      modoAutomatico = false;
     } 
+  } else if (orden == 'a') {
+    retrocederCoche();
+  } else if (orden == 'b') {
+    pararCoche();
   } else {
-    //avanzarCoche();       
-    //moverAI();
+    pararCoche();
   }
 }
  
@@ -172,6 +129,7 @@ void loop() {
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheDcha() {
+    apagarLeds();
     encenderLedDcha();
     if (giroCerrado()) {
       digitalWrite(motoresIzquierdosAvanzar, HIGH);
@@ -186,6 +144,7 @@ void loop() {
    * Función para hacer que el coche gire hacia la izquierda.
    */
   void girarCocheIzq() {
+    apagarLeds();
     encenderLedIzq();
     if (giroCerrado()) {
       digitalWrite(motoresDerechosAvanzar, HIGH);
