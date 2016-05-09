@@ -21,6 +21,7 @@ int trig = 12;
 int echo = 13;
 float distancia;
 
+// Variables de control
 boolean modoAutomatico = false;
 float distanciaMinima = 0.20;
 char orden;
@@ -45,7 +46,6 @@ void setup() {
 
 void loop() {
   // Bluetooth disponible, pasamos a leer.
-  //
   if (BT.available()){
     
     Serial.write(BT.read());
@@ -122,16 +122,14 @@ void loop() {
       pararCoche();
     }
 
-     // Envia datos al coche via bluetooth.
+    // Envia datos al coche via bluetooth.
     if (Serial.available()){
       BT.write(Serial.read());
     } 
   } else {
-    //avanzarCoche();      
+    //avanzarCoche();       
     //moverAI();
   }
-
- 
 }
  
   /* ============================*/
@@ -197,11 +195,7 @@ void loop() {
       digitalWrite(motoresIzquierdosRetroceder, LOW);  
     }
   }
-
-  /* =============================*/
-  /* = Funciones modo automático =*/
-  /* =============================*/
-
+  
   /**
    * Función modo automático. Detectará obstáculos e intentará evitarlos.
    */
@@ -225,8 +219,8 @@ void loop() {
         delay(delayGiro);
         pararCoche();
       }
-   }
-}
+    }
+  }
 
   /* =========================*/
   /* = Funciones de medición =*/
@@ -315,6 +309,9 @@ void loop() {
   /* = Funciones de sensores  =*/
   /* ==========================*/
 
+  /**
+   * Función para hacer que el claxon pite
+   */
   void pitar() {
     analogWrite(claxon, 100);
   }  
