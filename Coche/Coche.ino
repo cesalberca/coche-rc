@@ -25,6 +25,9 @@ float distancia;
 boolean modoAutomatico = false;
 float distanciaMinima = 0.20;
 char orden;
+int randNum;
+int delayGiro = 750;
+boolean encontradoObstaculoAnteriormente;
 
 SoftwareSerial BT(txd, rxd);
 
@@ -82,206 +85,216 @@ void loop() {
   }
 }
  
-  /* ============================*/
-  /* = Funciones de movimiento  =*/
-  /* ============================*/
+/* ============================*/
+/* = Funciones de movimiento  =*/
+/* ============================*/
 
-  /**
-   * Función para hacer que el coche se mueva hacia delante.
-   */
-  void avanzarCoche() {
-    if(medirDistancia() > distanciaMinima) {
-      apagarLeds();
-      digitalWrite(motoresIzquierdosAvanzar, HIGH);
-      digitalWrite(motoresDerechosAvanzar, HIGH);    
-    } else {
-      pararCoche();
-    }
+/**
+ * Función para hacer que el coche se mueva hacia delante.
+ */
+void avanzarCoche() {
+  if(medirDistancia() > distanciaMinima) {
+    apagarLeds();
+    digitalWrite(motoresIzquierdosAvanzar, HIGH);
+    digitalWrite(motoresDerechosAvanzar, HIGH);    
+  } else {
+    pararCoche();
   }
+}
 
-  /**
-   * Función para hacer que el coche se mueva hacia delante.
-   */
-  void retrocederCoche() {
-    digitalWrite(motoresIzquierdosAvanzar, LOW);
-    digitalWrite(motoresDerechosAvanzar, LOW);
-    digitalWrite(motoresIzquierdosRetroceder, HIGH);
+/**
+ * Función para hacer que el coche se mueva hacia delante.
+ */
+void retrocederCoche() {
+  digitalWrite(motoresIzquierdosAvanzar, LOW);
+  digitalWrite(motoresDerechosAvanzar, LOW);
+  digitalWrite(motoresIzquierdosRetroceder, HIGH);
+  digitalWrite(motoresDerechosRetroceder, HIGH);
+}
+
+/**
+ * Función para hacer que el coche se pare.
+ */
+void pararCoche() {
+  encenderLedsParada();
+  pararCocheIzq();
+  pararCocheDcha();
+}
+
+/**
+ * Función para parar los motores de la izq
+ */
+void pararCocheIzq() {
+  digitalWrite(motoresIzquierdosAvanzar, LOW);
+  digitalWrite(motoresIzquierdosRetroceder, LOW);
+}
+
+/**
+ * Función para parar los motores de la dcha
+ */
+void pararCocheDcha() {
+  digitalWrite(motoresDerechosAvanzar, LOW);
+  digitalWrite(motoresDerechosRetroceder, LOW);
+}
+
+/**
+ * Función para hacer que el coche gire hacia la izquierda.
+ */
+void girarCocheDcha() {
+  apagarLeds();
+  pararCocheIzq();
+  encenderLedDcha();
+  if (giroCerrado()) {
+    digitalWrite(motoresIzquierdosAvanzar, HIGH);
     digitalWrite(motoresDerechosRetroceder, HIGH);
+  } else {
+    digitalWrite(motoresIzquierdosAvanzar, HIGH); 
+    digitalWrite(motoresDerechosRetroceder, LOW); 
   }
+}
 
-  /**
-   * Función para hacer que el coche se pare.
-   */
-  void pararCoche() {
-    encenderLedsParada();
-    pararCocheIzq();
-    pararCocheDcha();
+/**
+ * Función para hacer que el coche gire hacia la izquierda.
+ */
+void girarCocheIzq() {
+  apagarLeds();
+  pararCocheDcha();
+  encenderLedIzq();
+  if (giroCerrado()) {
+    digitalWrite(motoresDerechosAvanzar, HIGH);
+    digitalWrite(motoresIzquierdosRetroceder, HIGH);  
+  } else {
+    digitalWrite(motoresDerechosAvanzar, HIGH);
+    digitalWrite(motoresIzquierdosRetroceder, LOW);  
   }
+}
 
-  /**
-   * Función para parar los motores de la izq
-   */
-  void pararCocheIzq() {
-    digitalWrite(motoresIzquierdosAvanzar, LOW);
-    digitalWrite(motoresIzquierdosRetroceder, LOW);
-  }
+/**
+ * Función modo automático. Detectará obstáculos e intentará evitarlos.
+ */
 
-  /**
-   * Función para parar los motores de la dcha
-   */
-  void pararCocheDcha() {
-    digitalWrite(motoresDerechosAvanzar, LOW);
-    digitalWrite(motoresDerechosRetroceder, LOW);
-  }
-
-  /**
-   * Función para hacer que el coche gire hacia la izquierda.
-   */
-  void girarCocheDcha() {
-    apagarLeds();
-    pararCocheIzq();
-    encenderLedDcha();
-    if (giroCerrado()) {
-      digitalWrite(motoresIzquierdosAvanzar, HIGH);
-      digitalWrite(motoresDerechosRetroceder, HIGH);
-    } else {
-      digitalWrite(motoresIzquierdosAvanzar, HIGH); 
-      digitalWrite(motoresDerechosRetroceder, LOW); 
-    }
-  }
-
-  /**
-   * Función para hacer que el coche gire hacia la izquierda.
-   */
-  void girarCocheIzq() {
-    apagarLeds();
-    pararCocheDcha();
-    encenderLedIzq();
-    if (giroCerrado()) {
-      digitalWrite(motoresDerechosAvanzar, HIGH);
-      digitalWrite(motoresIzquierdosRetroceder, HIGH);  
-    } else {
-      digitalWrite(motoresDerechosAvanzar, HIGH);
-      digitalWrite(motoresIzquierdosRetroceder, LOW);  
-    }
-  }
+void moverAI() {
   
-  /**
-   * Función modo automático. Detectará obstáculos e intentará evitarlos.
-   */
-  void moverAI() {
-    int randNum;
-    int delayGiro = 750;
-    
-    if(medirDistancia() > distanciaMinima) {
-      avanzarCoche();
-    } else {
+  if(medirDistancia() > distanciaMinima) {
+    avanzarCoche();
+  } else {
+    pararCoche();
+    // Encontrado obstáculo. Decide en qué dirección girar aleatoriamente.
+    if (!encontradoObstaculoAnteriormente) {
       randNum = random(1, 3);
-
-      if (randNum == 1) {
-        pararCoche();
-        girarCocheIzq();
-        delay(delayGiro);
-        pararCoche();
-      } else {
-        pararCoche();
-        girarCocheDcha();
-        delay(delayGiro);
-        pararCoche();
+      
+      switch(randNum) {
+        case 1:
+          girarCocheIzq();
+          break;
+        case 2:
+          girarCocheDcha();
+          break;  
       }
-    }
-  }
-
-  /* =========================*/
-  /* = Funciones de medición =*/
-  /* =========================*/
-  
-  /**
-   * Función para comprobar si se debe ejecutar un giroAbierto o un giroCerrado 
-   */
-  boolean giroCerrado() {
-    if(medirDistancia() < 0.20) {
-      return true;
+      
+      delay(delayGiro);
+      pararCoche();
+      encontradoObstaculoAnteriormente = true;
     } else {
-      return false;
+      girarCocheIzq();
+      delay(delayGiro * 2);
+      encontradoObstaculoAnteriormente = false;
     }
-  }
-  
-  /**
-   * Función para determinar la distancia que hay entre el coche y un obstáculo.
-   */
-  float medirDistancia() {
-    //Inicializamos el sensor
-    digitalWrite(trig, LOW);
-    delayMicroseconds(5);
-
-    //Comenzamos las mediciones
-    digitalWrite(trig, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trig, LOW);
-
-    distancia = pulseIn(echo, HIGH);
-    distancia = distancia * 0.0001657;
-    Serial.println(distancia);
     
-    return distancia;
+    
   }
+}
 
-  /* ======================*/
-  /* = Funciones de leds  =*/
-  /* ======================*/
+/* =========================*/
+/* = Funciones de medición =*/
+/* =========================*/
 
-  /**
-   * Función para encender el coche. Enciende el Led de Encendido.
-   */
-  void encenderCoche() {
-    digitalWrite(ledEncendido, HIGH);
+/**
+ * Función para comprobar si se debe ejecutar un giroAbierto o un giroCerrado 
+ */
+boolean giroCerrado() {
+  if(medirDistancia() < 0.20) {
+    return true;
+  } else {
+    return false;
   }
+}
 
-  /**
-   * Función para apagar el coche. Apaga el Led de Encendido.
-   */
-  void apagarCoche() {
-    digitalWrite(ledEncendido, LOW);
-  }
+/**
+ * Función para determinar la distancia que hay entre el coche y un obstáculo.
+ */
+float medirDistancia() {
+  //Inicializamos el sensor
+  digitalWrite(trig, LOW);
+  delayMicroseconds(5);
+
+  //Comenzamos las mediciones
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  distancia = pulseIn(echo, HIGH);
+  distancia = distancia * 0.0001657;
+  Serial.println(distancia);
   
-  /**
-   * Función para encender led intermitente izquierdo.
-   */
-  void encenderLedIzq() {
-    digitalWrite(ledIzq, HIGH);
-  }
-  
-  /**
-   * Función para encender led intermitente derecho.
-   */
-  void encenderLedDcha() {
-    digitalWrite(ledDcha, HIGH);
-  }
+  return distancia;
+}
 
-  /**
-   * Función para apagar leds.
-   */
-  void apagarLeds() {
-    digitalWrite(ledIzq, LOW);
-    digitalWrite(ledDcha, LOW);
-  }
+/* ======================*/
+/* = Funciones de leds  =*/
+/* ======================*/
 
-  /**
-   * Función para encender los leds de parada.
-   */
-   void encenderLedsParada() {
-    encenderLedIzq();
-    encenderLedDcha();
-   }
+/**
+ * Función para encender el coche. Enciende el Led de Encendido.
+ */
+void encenderCoche() {
+  digitalWrite(ledEncendido, HIGH);
+}
 
-  /* ==========================*/
-  /* = Funciones de sensores  =*/
-  /* ==========================*/
+/**
+ * Función para apagar el coche. Apaga el Led de Encendido.
+ */
+void apagarCoche() {
+  digitalWrite(ledEncendido, LOW);
+}
 
-  /**
-   * Función para hacer que el claxon pite
-   */
-  void pitar() {
-    analogWrite(claxon, 100);
-  }  
+/**
+ * Función para encender led intermitente izquierdo.
+ */
+void encenderLedIzq() {
+  digitalWrite(ledIzq, HIGH);
+}
+
+/**
+ * Función para encender led intermitente derecho.
+ */
+void encenderLedDcha() {
+  digitalWrite(ledDcha, HIGH);
+}
+
+/**
+ * Función para apagar leds.
+ */
+void apagarLeds() {
+  digitalWrite(ledIzq, LOW);
+  digitalWrite(ledDcha, LOW);
+}
+
+/**
+ * Función para encender los leds de parada.
+ */
+ void encenderLedsParada() {
+  encenderLedIzq();
+  encenderLedDcha();
+ }
+
+/* ==========================*/
+/* = Funciones de sensores  =*/
+/* ==========================*/
+
+/**
+ * Función para hacer que el claxon pite
+ */
+void pitar() {
+  analogWrite(claxon, 100);
+}  
