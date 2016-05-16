@@ -5,10 +5,10 @@ int txd = 2;
 int rxd = 3;
 
 // Pines motores
-int motoresIzquierdosAvanzar = 5;
-int motoresIzquierdosRetroceder = 4;
-int motoresDerechosAvanzar = 7;
-int motoresDerechosRetroceder = 6;
+int motoresIzquierdosAvanzar = 7;
+int motoresIzquierdosRetroceder = 6;
+int motoresDerechosAvanzar = 5;
+int motoresDerechosRetroceder = 4;
 
 // Pines leds
 int ledEncendido = 8;
@@ -29,7 +29,7 @@ char orden;
 SoftwareSerial BT(txd, rxd);
 
 void setup() {
-  Serial.begin(9600);
+  BT.begin(9600);
   pinMode(trig, HIGH);
   pinMode(echo, INPUT);
   pinMode(ledEncendido, OUTPUT);
@@ -41,49 +41,42 @@ void setup() {
   pinMode(motoresDerechosAvanzar, OUTPUT);
   pinMode(motoresDerechosRetroceder, OUTPUT);
   randomSeed(analogRead(0)); 
-  BT.begin(9600); 
 }
 
 void loop() { 
   // Si el modulo a manda dato, guardarlo en estado.
   if (BT.available()) {
     orden = BT.read();
-    Serial.write(BT.read());
-  }
-  
-  if (Serial.available()) {
-    BT.write(Serial.read());
-  }
+    BT.println(BT.read());
 
-  // Avanzar
-  if (orden == '1') {
-    avanzarCoche();      
-  } else if (orden == '2') {
-    // Retroceder
-    retrocederCoche();
-  } else if (orden == '3') {
-    girarCocheIzq();
-  } else if (orden == '4') {
-    girarCocheDcha();
-  } else if (orden == '5') {
-    retrocederCoche();
-  } else if (orden == '6') {
-    retrocederCoche();
-  } else if (orden == '7') {
-    retrocederCoche();
-  } else if (orden == '8') {
-    retrocederCoche();
-  } else if (orden == '9') {
-    if(!modoAutomatico) {
-      moverAI();
-      modoAutomatico = true;
-    } else {
-      modoAutomatico = false;
+    if (orden == '1') {
+      avanzarCoche();      
+    } else if (orden == '2') {
+      retrocederCoche();
+    } else if (orden == '3') {
+      girarCocheIzq();
+    } else if (orden == '4') {
+      girarCocheDcha();
+    } else if (orden == '5') {
+      //retrocederCoche();
+    } else if (orden == '6') {
+      //retrocederCoche();
+    } else if (orden == '7') {
+      //retrocederCoche();
+    } else if (orden == '8') {
+      //retrocederCoche();
+    } else if (orden == '9') {
+      if(!modoAutomatico) {
+        moverAI();
+        modoAutomatico = true;
+      } else {
+        modoAutomatico = false;
+      } 
+    } else if (orden == 'a') {
+      //retrocederCoche();
+    } else if (orden == 'b') {
+      pararCoche();
     } 
-  } else if (orden == 'a') {
-    retrocederCoche();
-  } else if (orden == 'b') {
-    pararCoche();
   } else {
     pararCoche();
   }
@@ -110,6 +103,8 @@ void loop() {
    * Función para hacer que el coche se mueva hacia delante.
    */
   void retrocederCoche() {
+    digitalWrite(motoresIzquierdosAvanzar, LOW);
+    digitalWrite(motoresDerechosAvanzar, LOW);
     digitalWrite(motoresIzquierdosRetroceder, HIGH);
     digitalWrite(motoresDerechosRetroceder, HIGH);
   }
@@ -119,9 +114,23 @@ void loop() {
    */
   void pararCoche() {
     encenderLedsParada();
+    pararCocheIzq();
+    pararCocheDcha();
+  }
+
+  /**
+   * Función para parar los motores de la izq
+   */
+  void pararCocheIzq() {
     digitalWrite(motoresIzquierdosAvanzar, LOW);
-    digitalWrite(motoresDerechosAvanzar, LOW);
     digitalWrite(motoresIzquierdosRetroceder, LOW);
+  }
+
+  /**
+   * Función para parar los motores de la dcha
+   */
+  void pararCocheDcha() {
+    digitalWrite(motoresDerechosAvanzar, LOW);
     digitalWrite(motoresDerechosRetroceder, LOW);
   }
 
@@ -130,6 +139,7 @@ void loop() {
    */
   void girarCocheDcha() {
     apagarLeds();
+    pararCocheIzq();
     encenderLedDcha();
     if (giroCerrado()) {
       digitalWrite(motoresIzquierdosAvanzar, HIGH);
@@ -145,6 +155,7 @@ void loop() {
    */
   void girarCocheIzq() {
     apagarLeds();
+    pararCocheDcha();
     encenderLedIzq();
     if (giroCerrado()) {
       digitalWrite(motoresDerechosAvanzar, HIGH);
