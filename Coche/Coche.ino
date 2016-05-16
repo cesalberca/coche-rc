@@ -190,7 +190,7 @@ void loop() {
       pararCoche();
     } 
   } else {
-    pararCoche();
+    moverAI();
   }
 }
  
@@ -388,14 +388,6 @@ void apagarLeds() {
   digitalWrite(ledIzq, LOW);
   digitalWrite(ledDcha, LOW);
 }
-
-/**
- * Función para encender los leds de parada.
- */
- void encenderLedsParada() {
-  encenderLedIzq();
-  encenderLedDcha();
- }
 
 /**
  * Función para encender los leds de parada.
