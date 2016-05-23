@@ -23,10 +23,10 @@ float distancia;
 
 // Variables de control
 boolean modoAutomatico = false;
-float distanciaMinima = 0.20;
+float distanciaMinima = 0.15;
 char orden;
 int randNum;
-int delayGiro = 750;
+int delayGiro = 350;
 boolean encontradoObstaculoAnteriormente;
 
 //Constantes notas
@@ -283,12 +283,15 @@ void girarCocheIzq() {
  */
 
 void moverAI() {
+  modoAutomatico = true;
   
+  // Avanzar coche en caso que no haya obstaculos.
   if(medirDistancia() > distanciaMinima) {
     avanzarCoche();
   } else {
     pararCoche();
-    // Encontrado obstáculo. Decide en qué dirección girar aleatoriamente.
+    delay(100);
+    // Encontrado obstáculo. Decide aleatoriamente en qué dirección girar.
     if (!encontradoObstaculoAnteriormente) {
       randNum = random(1, 3);
       
@@ -307,10 +310,8 @@ void moverAI() {
     } else {
       girarCocheIzq();
       delay(delayGiro * 2);
-      encontradoObstaculoAnteriormente = false;
+      pararCoche();
     }
-    
-    
   }
 }
 
@@ -322,11 +323,16 @@ void moverAI() {
  * Función para comprobar si se debe ejecutar un giroAbierto o un giroCerrado 
  */
 boolean giroCerrado() {
-  if(medirDistancia() < 0.20) {
-    return true;
+  if (!modoAutomatico) {
+    if(medirDistancia() < distanciaMinima) {
+      return true;
+    } else {
+      return false;
+    }  
   } else {
-    return false;
+    return true;
   }
+  
 }
 
 /**
