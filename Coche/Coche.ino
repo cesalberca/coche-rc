@@ -288,6 +288,7 @@ void moverAI() {
   // Avanzar coche en caso que no haya obstaculos.
   if(medirDistancia() > distanciaMinima) {
     avanzarCoche();
+    
   } else {
     pararCoche();
     delay(100);
@@ -308,9 +309,20 @@ void moverAI() {
       pararCoche();
       encontradoObstaculoAnteriormente = true;
     } else {
-      girarCocheIzq();
+
+      // Girar al lado contrario durante el doble de tiempo.
+      switch(randNum) {
+        case 1:
+          girarCocheDcha();
+          break;
+        case 2:
+          girarCocheIzq();
+          break;  
+      }
+      
       delay(delayGiro * 2);
       pararCoche();
+      encontradoObstaculoAnteriormente = false;
     }
   }
 }
