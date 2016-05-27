@@ -11,7 +11,8 @@ int motoresDerechosAvanzar = 5;
 int motoresDerechosRetroceder = 4;
 
 // Pines leds
-int ledEncendido = 8;
+int ledEncendido= 1;
+int laser = 8;
 int ledDcha = 9;
 int ledIzq = 10;
 int claxon = 11;
@@ -23,11 +24,13 @@ float distancia;
 
 // Variables de control
 boolean modoAutomatico = false;
-float distanciaMinima = 0.15;
+float distanciaMinima = 0.20;
+int delayLaser = 1000;
 char orden;
 int randNum;
 int delayGiro = 350;
-boolean encontradoObstaculoAnteriormente;
+boolean encontradoObstaculoAnteriormente = false;
+boolean laserEncendido = false;
 
 //Constantes notas
 #define  C0      16.35
@@ -144,7 +147,7 @@ void setup() {
   BT.begin(9600);
   pinMode(trig, HIGH);
   pinMode(echo, INPUT);
-  pinMode(ledEncendido, OUTPUT);
+  pinMode(laser, OUTPUT);
   pinMode(ledIzq, OUTPUT);
   pinMode(ledDcha, OUTPUT);
   pinMode(claxon, OUTPUT);
@@ -170,13 +173,17 @@ void loop() {
     } else if (orden == '4') {
       girarCocheDcha();
     } else if (orden == '5') {
-      //retrocederCoche();
+      if (laserEncendido) {
+        apagarLaser();
+        laserEncendido = false;
+      } else {
+        encenderLaser();  
+        laserEncendido = true;
+      }
     } else if (orden == '6') {
-      sonar();
+      pitar();
     } else if (orden == '7') {
-      //retrocederCoche();
-    } else if (orden == '8') {
-      //retrocederCoche();
+      sonar();
     } else if (orden == '9') {
       if(!modoAutomatico) {
         moverAI();
@@ -204,6 +211,7 @@ void loop() {
 void avanzarCoche() {
   if(medirDistancia() > distanciaMinima) {
     apagarLeds();
+    digitalWrite(laser, HIGH);
     digitalWrite(motoresIzquierdosAvanzar, HIGH);
     digitalWrite(motoresDerechosAvanzar, HIGH);    
   } else {
@@ -288,10 +296,10 @@ void moverAI() {
   // Avanzar coche en caso que no haya obstaculos.
   if(medirDistancia() > distanciaMinima) {
     avanzarCoche();
-    
+    apagarLaser();
   } else {
+    encenderLaser();
     pararCoche();
-    delay(100);
     // Encontrado obstáculo. Decide aleatoriamente en qué dirección girar.
     if (!encontradoObstaculoAnteriormente) {
       randNum = random(1, 3);
@@ -371,18 +379,12 @@ float medirDistancia() {
 /* = Funciones de leds  =*/
 /* ======================*/
 
-/**
- * Función para encender el coche. Enciende el Led de Encendido.
- */
-void encenderCoche() {
-  digitalWrite(ledEncendido, HIGH);
+void encenderLaser() {
+  digitalWrite(laser, HIGH);
 }
 
-/**
- * Función para apagar el coche. Apaga el Led de Encendido.
- */
-void apagarCoche() {
-  digitalWrite(ledEncendido, LOW);
+void apagarLaser() {
+  digitalWrite(laser, HIGH);
 }
 
 /**
