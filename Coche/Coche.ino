@@ -133,13 +133,12 @@ boolean laserEncendido = false;
 #define Db8 4434.92
 #define D8  4698.64
 #define Eb8 4978.03
-// DURATION OF THE NOTES 
-#define BPM 120     // you can change this value changing all the others
-#define H 2*Q //half 2/4
-#define Q 60000/BPM //quarter 1/4 
-#define E Q/2   //eighth 1/8
-#define S Q/4 // sixteenth 1/16
-#define W 4*Q // whole 4/4
+#define BPM 120
+#define H 2*Q
+#define Q 60000/BPM
+#define E Q/2
+#define S Q/4
+#define W 4*Q
 
 SoftwareSerial BT(txd, rxd);
 
@@ -167,7 +166,7 @@ void loop() {
     if (orden == '1') {
       avanzarCoche();      
     } else if (orden == '2') {
-      retrocederCoche();
+      pararCoche();
     } else if (orden == '3') {
       girarCocheIzq();
     } else if (orden == '4') {
@@ -192,10 +191,8 @@ void loop() {
         modoAutomatico = false;
       } 
     } else if (orden == 'a') {
-      //retrocederCoche();
-    } else if (orden == 'b') {
-      pararCoche();
-    } 
+      retrocederCoche();
+    }
   } else {
     moverAI();
   }
@@ -289,7 +286,6 @@ void girarCocheIzq() {
 /**
  * Función modo automático. Detectará obstáculos e intentará evitarlos.
  */
-
 void moverAI() {
   modoAutomatico = true;
   
@@ -317,7 +313,6 @@ void moverAI() {
       pararCoche();
       encontradoObstaculoAnteriormente = true;
     } else {
-
       // Girar al lado contrario durante el doble de tiempo.
       switch(randNum) {
         case 1:
@@ -379,10 +374,16 @@ float medirDistancia() {
 /* = Funciones de leds  =*/
 /* ======================*/
 
+/**
+ * Encender laser
+ */
 void encenderLaser() {
   digitalWrite(laser, HIGH);
 }
 
+/**
+ * Apagar laser
+ */
 void apagarLaser() {
   digitalWrite(laser, HIGH);
 }
@@ -428,6 +429,9 @@ void pitar() {
   analogWrite(claxon, 100);
 }  
 
+/**
+ * Función que activa el modo radio
+ */
 void sonar(){
   tone(11,LA3,Q); 
   delay(1+Q);
