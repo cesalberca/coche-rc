@@ -31,6 +31,7 @@ int randNum;
 int delayGiro = 350;
 boolean encontradoObstaculoAnteriormente = false;
 boolean laserEncendido = false;
+boolean pitando = false;
 
 //Constantes notas
 #define  C0      16.35
@@ -180,21 +181,32 @@ void loop() {
         laserEncendido = true;
       }
     } else if (orden == '6') {
+      if (pitando) {
+        pararPito();
+        pitando = false;
+      } else {
+        pitar();
+        pitando = true;
+      }
       pitar();
     } else if (orden == '7') {
       sonar();
-    } else if (orden == '9') {
+    } else if (orden == '8') {
       if(!modoAutomatico) {
         moverAI();
         modoAutomatico = true;
       } else {
         modoAutomatico = false;
+        pararCoche();
       } 
     } else if (orden == 'a') {
       retrocederCoche();
+    } else {
+      pararCoche();
     }
   } else {
     moverAI();
+    modoAutomatico = true;
   }
 }
  
@@ -287,8 +299,6 @@ void girarCocheIzq() {
  * Función modo automático. Detectará obstáculos e intentará evitarlos.
  */
 void moverAI() {
-  modoAutomatico = true;
-  
   // Avanzar coche en caso que no haya obstaculos.
   if(medirDistancia() > distanciaMinima) {
     avanzarCoche();
@@ -428,6 +438,11 @@ void apagarLeds() {
 void pitar() {
   analogWrite(claxon, 100);
 }  
+
+void pararPito() {
+  analogWrite(claxon, 0);
+}  
+
 
 /**
  * Función que activa el modo radio
